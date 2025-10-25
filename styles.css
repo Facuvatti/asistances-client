@@ -15,7 +15,7 @@ form {
   --warning-color: #f5c84c;
   --font-family: "Inter", "Segoe UI", sans-serif;
 }
-
+/**/
 * {
   box-sizing: border-box;
   transition: 0.2s ease all;
