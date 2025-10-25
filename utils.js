@@ -1,3 +1,4 @@
+require('dotenv').config();
 function formResult(event) {
     const form = event.target;
     for(let element of form.elements) {
@@ -13,7 +14,7 @@ function formResult(event) {
     console.log("Resultado del formulario:", data);
     return data 
 }
-async function httpRequest(endpoint,method,body,url=import.meta.env.backend,event=null) { // Es un handler para formularios
+async function httpRequest(endpoint,method,body,url=process.env.backend,event=null) { // Es un handler para formularios
     let options = {
         method: method,
         headers: {'Content-Type': 'application/json'}
