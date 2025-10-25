@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:env';
 function formResult(event) {
     const form = event.target;
     for(let element of form.elements) {
