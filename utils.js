@@ -1,4 +1,3 @@
-require('dotenv').config();
 function formResult(event) {
     const form = event.target;
     for(let element of form.elements) {
@@ -14,7 +13,7 @@ function formResult(event) {
     console.log("Resultado del formulario:", data);
     return data 
 }
-async function httpRequest(endpoint,method,body,url=process.env.backend,event=null) { // Es un handler para formularios
+async function httpRequest(endpoint,method,body,url="https://asistances-backend.facuvatti.workers.dev/",event=null) { // Es un handler para formularios
     let options = {
         method: method,
         headers: {'Content-Type': 'application/json'}
@@ -110,7 +109,7 @@ function makeRow(row,table) {
         tr.remove();
     }
     remove.classList.add("remove");
-    if(row.actions == undefined) row.remove = remove;
+    if(row.actions == undefined) row.remove = remove; 
     for(let column in row) {
         if (column == "id") continue;
         let td = document.createElement("td");
