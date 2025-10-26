@@ -7,7 +7,7 @@ init()
 function makeRoom(e) {
     e.preventDefault();
     let body = formResult(e);
-    httpRequest("students","POST",body);
+    console.log(httpRequest("students","POST",body));
 }
 
 document.querySelector("#load-class").addEventListener("submit", makeRoom);
