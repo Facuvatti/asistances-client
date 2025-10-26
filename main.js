@@ -64,7 +64,6 @@ function makeButton(name,eventListener,parameters) {
 
 async function students(year,division,specialty,toHide=["#students","#new_student"]) {
     try{
-        
         let anchor = document.querySelector("#load");
         anchor.href = "load.html";
         let header = document.querySelector("header");
@@ -111,8 +110,8 @@ async function init(){
     let response = await httpRequest("classes","GET");
     if(response.length == 0) window.location.replace("load.html");
     const year = await dbOptions(document.querySelector("#year"),"years");
-    const division = await dbOptions(document.querySelector("#division"),"divisions");
     const specialty = await dbOptions(document.querySelector("#specialty"),"specialties");
+    const division = await dbOptions(document.querySelector("#division"),"divisions");
     if (!year.options.length || !division.options.length || !specialty.options.length) {
         console.error("Faltan opciones para armar la clase");
         return;
