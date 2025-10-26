@@ -113,6 +113,10 @@ async function init(){
     const year = await dbOptions(document.querySelector("#year"),"years");
     const division = await dbOptions(document.querySelector("#division"),"divisions");
     const specialty = await dbOptions(document.querySelector("#specialty"),"specialties");
+    if (!year.options.length || !division.options.length || !specialty.options.length) {
+        console.error("Faltan opciones para armar la clase");
+        return;
+    }
     students(year,division,specialty)
     year.addEventListener("change", () => students(year,division,specialty))
     division.addEventListener("change", () => students(year,division,specialty))

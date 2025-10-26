@@ -75,6 +75,7 @@ function selected(select){
 }
 async function dbOptions(select,endpoint,fields=undefined) {
     let optionsResponse = await httpRequest(endpoint,"GET");
+    console.log("Opciones de", endpoint, optionsResponse);
     let options = [];
     let ids = [];
     if(fields) {
