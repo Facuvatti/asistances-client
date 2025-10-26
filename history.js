@@ -156,11 +156,13 @@ async function asistanceByStudent() {
     const studentId = selected(selectStudent).value;
     // Definiendo variables
     let m = 1;
-    let today = new Date().toISOString().split('T')[0];
     let table = document.querySelector("#byStudent > table");
     if(table.querySelector("tbody")) table.querySelector("tbody").remove();
     let tbody = document.createElement("tbody");
     tbody.innerHTML = "";
+    let attendances = await httpRequest("student/asistances/"+studentId,"GET")
+    console.log(attendances);
+    const Year = new Date().toISOString().split('T')[0].split("-")[0];
     // Agregando las filas ( y la presencia del alumno en cada dia)
     for(let month of ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]) {
         // Nombre del mes
@@ -171,8 +173,8 @@ async function asistanceByStudent() {
         for(let day=1;day<=32;day++) {
             // Asistencia del alumno por dia
             let td = document.createElement("td");
-            let presence = await httpRequest("student/asistances/"+studentId+"/"+today.substring(0, 4)+"-"+m+"-"+day,"GET")
-            if(presence && presence.length > 0) {td.textContent = presence[0]["presence"];}
+            let presence = attendances.find(attendance => {if(attendance["date"].split(" ")[0] == Year+"-"+m+"-"+day) {td.textContent = attendance["presence"];return attendance;} else return undefined;});
+            if(presence) {td.textContent = presence["presence"];}
             else {td.textContent = "";}
             tr.append(td);
         }

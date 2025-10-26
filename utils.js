@@ -28,7 +28,8 @@ async function httpRequest(endpoint,method,body,url="https://asistances-backend.
         console.error(`❌ Error HTTP ${response.status}: ${response.statusText} (${url + endpoint})`);
         return null;
     }
-    try {let json = await response.json();return json;} catch(e) {console.log(e,response);}
+    
+    try {let json = await response.json();return json;} catch(e) {console.log("Sin body");}
 }
 // tengo que arreglar esta funcion
 function insertToSelection(options,select=undefined,ids=undefined) {
@@ -38,7 +39,7 @@ function insertToSelection(options,select=undefined,ids=undefined) {
     if(typeof options == "object"){
         for (let option of options) {
             let op = document.createElement("option");
-            if(ids) {op.value = ids[options.indexOf(option)];console.log(op.value);}
+            if(ids) {op.value = ids[options.indexOf(option)];}
             if (typeof option == "string" && op.value == null) op.value = option;
             if(typeof option == "object" && op.value == null) op.value = Object.values(option)[0];
             

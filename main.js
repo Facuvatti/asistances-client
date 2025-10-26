@@ -78,7 +78,6 @@ async function students(year,division,specialty,toHide=["#students","#new_studen
         let lastAsistances = getLatestRecords(asistances);
         httpRequest("students/"+classroom[0].id,"GET")
         .then(students => {
-            console.log(students);
             for(let student of students) {
                 let present = makeButton("P",radioButton,[student]);
                 let late = makeButton("T",radioButton,[student]);

@@ -4,10 +4,10 @@ async function init() {
     if(response.length == 0) document.querySelector("#index").remove();
 }
 init()
-function makeRoom(e) {
+async function makeRoom(e) {
     e.preventDefault();
     let body = formResult(e);
-    httpRequest("students","POST",body).then(res => res.json()).then(data => console.log(data)).catch(e => console.log(e));
+    await httpRequest("students","POST",body);
 }
 
 document.querySelector("#load-class").addEventListener("submit", makeRoom);
