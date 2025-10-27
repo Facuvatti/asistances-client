@@ -6,12 +6,11 @@ function formResult(event) {
     const formData = new FormData(form);
     const data = {};
     for (let [key, value] of formData.entries()) {
-        if (typeof value === 'string') value = value.toLowerCase();
+        if (typeof value === 'string' && key != "password") value = value.toLowerCase();
         data[key] = value.trim();
     }
     form.reset();
     if(Object.values(data).some(values => values == "")) {alert("No podes dejar campos vacios");return undefined;}
-    console.log("Resultado del formulario:", data);
     return data 
 }
 async function httpRequest(endpoint,method,body,url="https://asistances-backend.facuvatti.workers.dev/",event=null) { // Es un handler para formularios
@@ -30,7 +29,7 @@ async function httpRequest(endpoint,method,body,url="https://asistances-backend.
         return null;
     }
     
-    try {let json = await response.json();return json;} catch(e) {console.log("Sin body");}
+    try {let json = await response.json();console.log(json);return json;} catch(e) {console.log("Sin body");}
 }
 
 function insertToSelection(options,select=undefined,ids=undefined) {
@@ -179,4 +178,35 @@ function getLatestRecords(data) {
     }
     
 }
-export {formResult,httpRequest,insertToSelection,capitalize,selected,dbOptions,visibility,makeRow,getLatestRecords};
+class Cookie {
+    constructor(name, value, days) {
+        this.name = name;
+        this.value = value;
+        this.days = days;
+    }
+    static get(name) {
+        if(this.name && !name) name = this.name;
+        const nameEQ = name + "=";
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i];
+            while (cookie.charAt(0) === ' ') cookie = cookie.substring(1, cookie.length);
+            if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+        }
+        return undefined;
+    }
+    static set(name, value, days) {
+        if(this.name && !name) name = this.name;
+        if(this.value && !value) value = this.value;
+        if(this.days && !days) days = this.days;
+        let cookie = name + "=" + value + ";";
+        if(days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            cookie = cookie + expires;
+        }
+        document.cookie = cookie + ";path=/";
+    }
+}
+export {formResult,httpRequest,insertToSelection,capitalize,selected,dbOptions,visibility,makeRow,getLatestRecords,Cookie};

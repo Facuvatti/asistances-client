@@ -1,5 +1,4 @@
 import {formResult,httpRequest,makeRow,visibility,dbOptions,selected, getLatestRecords} from "./utils.js";
-
 function createForm(containerID,inputs=[["name","text"]],action="creating",add_method="append",insertBefore="",onlyOne=true,cancelFunction=undefined) {
     if (document.querySelectorAll("."+action+"-"+containerID).length == 0 || !onlyOne) {
         let form = document.createElement("form");
@@ -51,11 +50,15 @@ function radioButton(event,row) {
     event.preventDefault();
     let button = event.currentTarget;
     let container = button.parentNode;
+    let buttons = Array.from(container.children);
     if(!button.classList.contains(button.textContent)) {
         httpRequest("asistances/"+row.id+"/"+button.textContent,"POST");
-        Array.from(container.children).forEach(bttn => bttn.className = "");
+        buttons.forEach(bttn => bttn.className = "");
         button.className = button.textContent;
     }
+    buttons.forEach(bttn =>{ bttn.disabled = true;bttn.style.pointerEvents = "none";bttn.style.opacity = "0.5";});
+
+    setTimeout(() => {buttons.forEach(bttn =>{ bttn.disabled = false;bttn.style.pointerEvents = "all";bttn.style.opacity = "1";});},2500);
 }
 function makeButton(name,eventListener,parameters) {
     let button = document.createElement("button");
