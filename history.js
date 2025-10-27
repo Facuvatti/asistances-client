@@ -90,7 +90,7 @@ function reset() {
     let header = document.querySelector("header")
     let anchor = document.querySelector("#index");
     anchor.href = "index.html";
-    header.append(anchor);
+    header.insertBefore(anchor,header.querySelector("#login"));
 }
 async function asistanceByClass() {
     let {classroom, year, division, specialty} = await getClassroom();

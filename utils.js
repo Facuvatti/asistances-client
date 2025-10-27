@@ -10,6 +10,7 @@ function formResult(event) {
         data[key] = value.trim();
     }
     form.reset();
+    if(Object.values(data).some(values => values == "")) {alert("No podes dejar campos vacios");return undefined;}
     console.log("Resultado del formulario:", data);
     return data 
 }
