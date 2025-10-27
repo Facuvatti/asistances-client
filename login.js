@@ -3,9 +3,10 @@ async function onSubmit(event) {
   event.preventDefault();
   const body = formResult(event);
   if(!body) return;
+  body.deviceId =  Cookie.get("deviceId");
   let response = await httpRequest("register","POST",body);
   const user = response.id;
-  Cookie.set("user",user);
+
   window.location.href = "index.html";
 
 }

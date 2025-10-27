@@ -57,9 +57,7 @@ class Fingerprint {
             webglFingerprint: this.webGLF()
         }; 
         const infoStr = JSON.stringify(info); 
-        console.log("Cadena de datos combinada:", infoStr);
         this.fingerprint = await hash(infoStr);
-        console.log("Fingerprint generado:", this.fingerprint);
         return this.fingerprint;
 
     }
@@ -71,14 +69,14 @@ async function getIp() {
     return ip;
 }
 async function getDevice() {
-    if(Cookie.get("deviceId")) return deviceId.get();
+    if(Cookie.get("fingerprint")) return Cookie.get();
     else {
         let fingerprint = new Fingerprint();
         fingerprint = await fingerprint.run();
-        Cookie.set("deviceId",fingerprint);
+        Cookie.set("fingerprint",fingerprint,7);
         let result = await httpRequest(`device/${fingerprint}`,"GET");
         if(result.exists) return fingerprint;
-        await httpRequest(`device/`,"POST",{fingerprint});
+        await httpRequest(`device`,"POST",{fingerprint});
         return fingerprint;
     }
 }

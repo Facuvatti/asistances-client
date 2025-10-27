@@ -29,7 +29,7 @@ async function httpRequest(endpoint,method,body,url="https://asistances-backend.
         return null;
     }
     
-    try {let json = await response.json();console.log(json);return json;} catch(e) {console.log("Sin body");}
+    try {let json = await response.json();console.log(json);return json;} catch(e) {console.error(e);}
 }
 
 function insertToSelection(options,select=undefined,ids=undefined) {
