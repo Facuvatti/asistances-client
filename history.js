@@ -163,6 +163,7 @@ async function studentGrid() {
 async function asistanceByStudent() {
     reset();
     let {classroom} = await getClassroom();
+    console.log(classroom);
     await chooseStudent(classroom);
     let selectStudent = document.querySelector("#selectStudent");
     await studentGrid(classroom)
@@ -187,6 +188,7 @@ async function asistanceByStudent() {
         for(let day=1;day<=31;day++) {
             // Asistencia del alumno por dia
             let td = document.createElement("td");
+            td.style.border = '1px solid black';
             td.style.textAlign = "center";
             let presence = attendances.find(attendance => {if(attendance["date"].split(" ")[0] == Year+"-"+m+"-"+day) {td.textContent = attendance["presence"];return attendance;} else return undefined;});
             if(presence) {
@@ -221,6 +223,7 @@ async function showAsistances(by) {
     if(by == "Clase") {
         if(byStudent) byStudent.remove();
         if(document.querySelector("#selectStudent")) document.querySelector("#selectStudent").remove();
+        if(document.querySelector("#ausents")) document.querySelector("#ausents").remove();
         return await asistanceByClass();
     }
     if(by == "Alumno") {

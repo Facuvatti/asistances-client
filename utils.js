@@ -1,7 +1,7 @@
 function formResult(event) {
     const form = event.target;
     for(let element of form.elements) {
-        if(!["BUTTON","INPUT"].includes(element.tagName)) form.remove(element);
+        if(!["BUTTON","INPUT","TEXTAREA"].includes(element.tagName)) element.remove();
     }
     const formData = new FormData(form);
     const data = {};
@@ -32,7 +32,7 @@ async function httpRequest(endpoint,method,body,url="https://asistances-backend.
     
     try {let json = await response.json();return json;} catch(e) {console.log("Sin body");}
 }
-// tengo que arreglar esta funcion
+
 function insertToSelection(options,select=undefined,ids=undefined) {
     if (select == undefined) {
         select = document.createElement("select");
@@ -69,11 +69,13 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 function selected(select){
+    if(select){
     if(select.options.length === 1) return select.options[0];
     else {
         let selection = select.options[select.selectedIndex];
         return selection;
-    }
+    }}
+    else return undefined
 }
 async function dbOptions(select,endpoint,fields=undefined) {
     let optionsResponse = await httpRequest(endpoint,"GET");

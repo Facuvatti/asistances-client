@@ -7,7 +7,8 @@ init()
 async function makeRoom(e) {
     e.preventDefault();
     let body = formResult(e);
-    await httpRequest("students","POST",body);
+    if(!body) return;
+    else await httpRequest("students","POST",body);
 }
 
 document.querySelector("#load-class").addEventListener("submit", makeRoom);

@@ -106,14 +106,14 @@ async function students(year,division,specialty,toHide=["#students","#new_studen
         });
     } catch(e) {console.log(e)}
 }
-function newStudentButton(){
+function newStudentButton(year,division,specialty) {
     let new_student = document.createElement("button");
     new_student.textContent = "Añadir alumno";
     new_student.id = "new_student";
-    new_student.addEventListener("click",newStudent);
+    new_student.addEventListener("click",( event ) => newStudent(event,year,division,specialty));
     document.querySelector("body").append(new_student);
 }
-function newStudent(event) {
+function newStudent(event,year,division,specialty) {
     event.preventDefault();
     document.querySelector("#new_student").remove();
     let form = createForm(
@@ -130,8 +130,10 @@ function newStudent(event) {
         let body = formResult(event);
         if(!body) return;
         else {
+        const classroom = await httpRequest("class/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
+        console.log(classroom);
+        body.classId = classroom[0].id;
             let response = await httpRequest("student","POST",body);
-            console.log(response);
             let id = response[0].id; 
             body.id = id;
             let present = makeButton("P",radioButton,body);
@@ -142,6 +144,7 @@ function newStudent(event) {
             actions.append(present,late,absent,retired);
             body.actions = actions;
             delete body.id;
+            delete body.classId;
             makeRow(body,document.querySelector("#students > tbody"));
             body.year = selected(year).value;
             body.division = selected(division).value;
@@ -167,7 +170,7 @@ async function init(){
     year.addEventListener("change", () => students(year,division,specialty))
     division.addEventListener("change", () => students(year,division,specialty))
     specialty.addEventListener("change", () => students(year,division,specialty))
-    newStudentButton();
+    newStudentButton(year,division,specialty);
 
 }
 init();
