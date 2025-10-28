@@ -74,8 +74,6 @@ async function getDevice() {
         let fingerprint = new Fingerprint();
         fingerprint = await fingerprint.run();
         Cookie.set("fingerprint",fingerprint,7);
-        let result = await httpRequest(`device/${fingerprint}`,"GET");
-        if(result.exists) return fingerprint;
         await httpRequest(`device`,"POST",{fingerprint});
         return fingerprint;
     }
