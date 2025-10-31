@@ -52,7 +52,8 @@ function radioButton(event,row,dbTable="asistances") {
     let container = button.parentNode;
     Array.from(container.children).forEach(bttn => bttn.className = "");
     button.className = button.textContent;
-    httpRequest("asistances/"+row.id+"/"+button.textContent,"POST");
+    let body = {studentId: row.id, presence: button.textContent};
+    httpRequest("asistances","POST",body);
 }
 function makeButton(name,eventListener,parameters) {
     let button = document.createElement("button");
