@@ -87,8 +87,8 @@ async function checkSession () {
             let closeSession = document.createElement("button");
             closeSession.classList.add("closeSession");
             closeSession.textContent = "Cerrar Sesion";
-            closeSession.addEventListener("click", () => {
-                httpRequest("account/logout","POST");
+            closeSession.addEventListener("click", async () => {
+                console.log(await httpRequest("account/logout","POST"));
                 location.href = "index.html";
             });        
             document.querySelector("header").append(closeSession);
