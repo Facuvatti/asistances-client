@@ -23,7 +23,7 @@ async function getClassroom() {
     if(document.querySelector("#year").options.length == 0) {const year = await dbOptions(document.querySelector("#year"),"years");}
     if(document.querySelector("#division").options.length == 0) {const division = await dbOptions(document.querySelector("#division"),"divisions");}
     if(document.querySelector("#specialty").options.length == 0) {const specialty = await dbOptions(document.querySelector("#specialty"),"specialties");}
-    let classroom = await httpRequest("class/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
+    let classroom = await httpRequest("classes/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
     classroom = classroom[0].id;
     return {classroom, year, division, specialty}
 }
@@ -109,7 +109,7 @@ async function asistanceByClass() {
     if(dateInput.value && classroom){
         let tbody = document.querySelector("#asistances > tbody");
         tbody.innerHTML = "";
-        let asistances = await httpRequest("asistances/"+classroom+"/"+dateInput.value,"GET")
+        let asistances = await httpRequest("asistances","GET",{date: dateInput.value, classId: classroom});
         asistances.forEach(asistance => delete asistance.student);
         let details = document.querySelector("#details");
         details.addEventListener("change",(event) => expandDetails(event,asistances,tbody));  
@@ -174,7 +174,7 @@ async function asistanceByStudent() {
     if(table.querySelector("tbody")) table.querySelector("tbody").remove();
     let tbody = document.createElement("tbody");
     tbody.innerHTML = "";
-    let attendances = await httpRequest("student/asistances/"+studentId,"GET")
+    let attendances = await httpRequest("asistances/student/"+studentId,"GET")
     const Year = new Date().toISOString().split('T')[0].split("-")[0];
     let yearAusents = 0;
     // Agregando las filas ( y la presencia del alumno en cada dia)

@@ -1,3 +1,4 @@
+
 import {httpRequest,Cookie} from "./utils.js";
 async function hash(data) {
   const msgUint8 = new TextEncoder().encode(data);
@@ -6,7 +7,6 @@ async function hash(data) {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   return hashHex;
 }
-
 class Fingerprint {
     constructor() {
         this.fingerprint = null;
@@ -62,12 +62,12 @@ class Fingerprint {
 
     }
 }
-async function getIp() {
-    let ips = await httpRequest("cdn-cgi/trace","GET",undefined,'https://www.cloudflare.com/');
-    const ipRegex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/;
-    const ip = ips.match(ipRegex)[0];
-    return ip;
-}
+// async function getIp() {
+//     let ips = await httpRequest("cdn-cgi/trace","GET",undefined,'https://www.cloudflare.com/');
+//     const ipRegex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/;
+//     const ip = ips.match(ipRegex)[0];
+//     return ip;
+// }
 async function getDevice() {
     if(Cookie.get("fingerprint")) return Cookie.get();
     else {
@@ -78,4 +78,38 @@ async function getDevice() {
         return fingerprint;
     }
 }
-getDevice()
+async function checkSession () {
+    const userCreated = await httpRequest("account","GET");
+    if(userCreated) {
+        if(!document.querySelector(".closeSession")){
+            if(document.querySelector(".login")) document.querySelector(".login").remove();
+            if(document.querySelector(".register")) document.querySelector(".register").remove();
+            let closeSession = document.createElement("button");
+            closeSession.classList.add("closeSession");
+            closeSession.textContent = "Cerrar Sesion";
+            closeSession.addEventListener("click", () => {
+                httpRequest("account/logout","POST");
+                location.href = "index.html";
+            });        
+            document.querySelector("header").append(closeSession);
+    }
+    } else if(!userCreated) {
+        if(document.querySelector(".closeSession")) document.querySelector(".closeSession").remove();
+        if(!document.querySelector(".login")){
+            let login = document.createElement("button");
+            login.classList.add("login");
+            login.textContent = "Iniciar Sesion";
+            login.addEventListener("click", () => location.href = "account.html?login");
+            document.querySelector("header").append(login);
+        }
+        if(!document.querySelector(".register")){
+            let register = document.createElement("button");
+            register.classList.add("register");
+            register.textContent = "Registrarse";
+            register.addEventListener("click", () => location.href = "account.html?register");
+            document.querySelector("header").append(register);
+        }
+    }
+}
+getDevice();
+checkSession();

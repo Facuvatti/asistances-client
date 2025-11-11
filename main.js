@@ -52,7 +52,7 @@ function radioButton(event,row) {
     let container = button.parentNode;
     let buttons = Array.from(container.children);
     if(!button.classList.contains(button.textContent)) {
-        httpRequest("asistances/"+row.id+"/"+button.textContent,"POST");
+        httpRequest("asistances","POST",{studentId: row.id, presence: button.textContent});
         buttons.forEach(bttn => bttn.className = "");
         button.className = button.textContent;
     }
@@ -77,7 +77,7 @@ async function students(year,division,specialty,toHide=["#students","#new_studen
         visibility(toHide,false);
         let tbody = document.querySelector("#students > tbody");
         tbody.innerHTML = "";
-        let classroom = await httpRequest("class/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET").catch(e => {console.log(e)});
+        let classroom = await httpRequest("classes/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET").catch(e => {console.log(e)});
         const today = new Date().toISOString().split('T')[0]
         let asistances = await httpRequest("asistances/"+classroom[0].id+"/"+today,"GET")
         let lastAsistances = getLatestRecords(asistances);
@@ -133,7 +133,7 @@ function newStudent(event,year,division,specialty) {
         let body = formResult(event);
         if(!body) return;
         else {
-        const classroom = await httpRequest("class/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
+        const classroom = await httpRequest("classes/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
         console.log(classroom);
         body.classId = classroom[0].id;
             let response = await httpRequest("student","POST",body);
@@ -162,9 +162,9 @@ function newStudent(event,year,division,specialty) {
 async function init(){
     let response = await httpRequest("classes","GET");
     if(response.length == 0) window.location.replace("load.html");
-    const year = await dbOptions(document.querySelector("#year"),"years");
-    const specialty = await dbOptions(document.querySelector("#specialty"),"specialties");
-    const division = await dbOptions(document.querySelector("#division"),"divisions");
+    const year = await dbOptions(document.querySelector("#year"),"classes/years");
+    const specialty = await dbOptions(document.querySelector("#specialty"),"classes/specialties");
+    const division = await dbOptions(document.querySelector("#division"),"classes/divisions");
     if (!year.options.length || !division.options.length || !specialty.options.length) {
         console.error("Faltan opciones para armar la clase");
         return;

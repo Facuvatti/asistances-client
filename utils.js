@@ -16,7 +16,10 @@ function formResult(event) {
 async function httpRequest(endpoint,method,body,url="https://asistances-backend.facuvatti.workers.dev/",event=null) { // Es un handler para formularios
     let options = {
         method: method,
-        headers: {'Content-Type': 'application/json'}
+        headers: {
+            'Content-Type': 'application/json',
+            credentials: 'include'
+        }
     };
     if (event) {
         let data = formResult(event);
