@@ -77,11 +77,11 @@ async function students(year,division,specialty,toHide=["#students","#new_studen
         visibility(toHide,false);
         let tbody = document.querySelector("#students > tbody");
         tbody.innerHTML = "";
-        let classroom = await httpRequest("classes/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET").catch(e => {console.log(e)});
+        let course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET").catch(e => {console.log(e)});
         const today = new Date().toISOString().split('T')[0]
-        let asistances = await httpRequest("asistances/"+classroom[0].id+"/"+today,"GET")
+        let asistances = await httpRequest("asistances/"+course[0].id+"/"+today,"GET")
         let lastAsistances = getLatestRecords(asistances);
-        httpRequest("students/"+classroom[0].id,"GET")
+        httpRequest("students/"+course[0].id,"GET")
         .then(students => {
             for(let student of students) {
                 let present = makeButton("P",radioButton,[student]);
@@ -133,9 +133,9 @@ function newStudent(event,year,division,specialty) {
         let body = formResult(event);
         if(!body) return;
         else {
-        const classroom = await httpRequest("classes/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
-        console.log(classroom);
-        body.classId = classroom[0].id;
+        const course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
+        console.log(course);
+        body.classId = course[0].id;
             let response = await httpRequest("student","POST",body);
             let id = response[0].id; 
             body.id = id;
@@ -147,7 +147,7 @@ function newStudent(event,year,division,specialty) {
             actions.append(present,late,absent,retired);
             body.actions = actions;
             delete body.id;
-            delete body.classId;
+            delete body.courseId;
             makeRow(body,document.querySelector("#students > tbody"));
             body.year = selected(year).value;
             body.division = selected(division).value;
@@ -160,11 +160,11 @@ function newStudent(event,year,division,specialty) {
     }
 }
 async function init(){
-    let response = await httpRequest("classes","GET");
+    let response = await httpRequest("courses","GET");
     if(response.length == 0) window.location.replace("load.html");
-    const year = await dbOptions(document.querySelector("#year"),"classes/years");
-    const specialty = await dbOptions(document.querySelector("#specialty"),"classes/specialties");
-    const division = await dbOptions(document.querySelector("#division"),"classes/divisions");
+    const year = await dbOptions(document.querySelector("#year"),"courses/years");
+    const specialty = await dbOptions(document.querySelector("#specialty"),"courses/specialties");
+    const division = await dbOptions(document.querySelector("#division"),"courses/divisions");
     if (!year.options.length || !division.options.length || !specialty.options.length) {
         console.error("Faltan opciones para armar la clase");
         return;

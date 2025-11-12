@@ -1,6 +1,6 @@
 import {httpRequest,formResult} from "./utils.js";
 async function init() {
-    let response = await httpRequest("classes","GET");
+    let response = await httpRequest("courses","GET");
     if(response.length == 0) document.querySelector("#index").remove();
 }
 init()
@@ -11,7 +11,7 @@ async function makeRoom(e) {
     else await httpRequest("students","POST",body);
 }
 
-document.querySelector("#load-class").addEventListener("submit", makeRoom);
+document.querySelector("#load-course").addEventListener("submit", makeRoom);
 window.addEventListener('DOMContentLoaded', () => {
     // Crear un objeto con los parámetros del URL
     const params = new URLSearchParams(window.location.search);

@@ -18,21 +18,21 @@ function expandDetails(event,asistances,tbody) {
     }
     
 }
-async function getClassroom() {
+async function getCourse() {
     
     if(document.querySelector("#year").options.length == 0) {const year = await dbOptions(document.querySelector("#year"),"years");}
     if(document.querySelector("#division").options.length == 0) {const division = await dbOptions(document.querySelector("#division"),"divisions");}
     if(document.querySelector("#specialty").options.length == 0) {const specialty = await dbOptions(document.querySelector("#specialty"),"specialties");}
-    let classroom = await httpRequest("classes/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
-    classroom = classroom[0].id;
-    return {classroom, year, division, specialty}
+    let course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
+    course = course[0].id;
+    return {course, year, division, specialty}
 }
 function createTable(){
-    if(document.querySelector("#byClass") == null) {
+    if(document.querySelector("#byCourse") == null) {
         const div = document.createElement('div');
         div.style.display = 'flex';
         div.style.flexDirection = 'row';
-        div.id = "byClass";
+        div.id = "byCourse";
         const table = document.createElement('table');
         table.id = 'asistances';
 
@@ -74,9 +74,9 @@ function createTable(){
         document.body.appendChild(div);
     }
 }
-function nullClassroom(year,division,specialty) {
-    let byClass = document.querySelector("#byClass")
-    if (byClass) byClass.remove();
+function nullCourse(year,division,specialty) {
+    let byCourse = document.querySelector("#byCourse")
+    if (byCourse) byCourse.remove();
     let header = document.querySelector("header");
     let body = document.querySelector("body")
     let anchor = header.querySelector("#index");
@@ -92,8 +92,8 @@ function reset() {
     anchor.href = "index.html";
     header.insertBefore(anchor,header.querySelector("#login"));
 }
-async function asistanceByClass() {
-    let {classroom, year, division, specialty} = await getClassroom();
+async function asistanceByCourse() {
+    let {course, year, division, specialty} = await getCourse();
     reset()
     createTable();
     let header = document.querySelector("header");
@@ -102,28 +102,28 @@ async function asistanceByClass() {
         const today = new Date().toISOString().split('T')[0]
         dateInput.value = today;
         dateInput.setAttribute("max",today);
-        dateInput.onchange = () => asistanceByClass();
+        dateInput.onchange = () => asistanceByCourse();
         header.insertBefore(dateInput,header.querySelector("#load"));
     }
     let dateInput = document.querySelector("#date");
-    if(dateInput.value && classroom){
+    if(dateInput.value && course){
         let tbody = document.querySelector("#asistances > tbody");
         tbody.innerHTML = "";
-        let asistances = await httpRequest("asistances","GET",{date: dateInput.value, classId: classroom});
+        let asistances = await httpRequest("asistances","GET",{date: dateInput.value, courseId: course});
         asistances.forEach(asistance => delete asistance.student);
         let details = document.querySelector("#details");
         details.addEventListener("change",(event) => expandDetails(event,asistances,tbody));  
         details.dispatchEvent(new Event('change'));
-        if(asistances.length == 0) nullClassroom(year,division,specialty);
-    } else document.querySelector("#byClass").remove();
+        if(asistances.length == 0) nullCourse(year,division,specialty);
+    } else document.querySelector("#byCourse").remove();
 
     
 }
-async function chooseStudent(classroom) {
+async function chooseStudent(course) {
     if(document.querySelector("#selectStudent") == null) {
-        let selectStudent = await dbOptions(undefined,"students/"+classroom,["id","lastname","name"]);
+        let selectStudent = await dbOptions(undefined,"students/"+course,["id","lastname","name"]);
         selectStudent.id = "selectStudent";
-        selectStudent.onchange = async () => await asistanceByStudent(classroom);
+        selectStudent.onchange = async () => await asistanceByStudent(course);
         document.querySelector("header").insertBefore(selectStudent,document.querySelector("#load"));
         return selectStudent;
 }
@@ -162,11 +162,11 @@ async function studentGrid() {
 }
 async function asistanceByStudent() {
     reset();
-    let {classroom} = await getClassroom();
-    console.log(classroom);
-    await chooseStudent(classroom);
+    let {course} = await getCourse();
+    console.log(course);
+    await chooseStudent(course);
     let selectStudent = document.querySelector("#selectStudent");
-    await studentGrid(classroom)
+    await studentGrid(course)
     const studentId = selected(selectStudent).value;
     // Definiendo variables
     let m = 1;
@@ -219,21 +219,21 @@ async function asistanceByStudent() {
 async function showAsistances(by) {
     by = selected(by).value;
     const byStudent = document.querySelector("#byStudent")
-    const byClass = document.querySelector("#byClass")
+    const byCourse = document.querySelector("#byCourse")
     if(by == "Clase") {
         if(byStudent) byStudent.remove();
         if(document.querySelector("#selectStudent")) document.querySelector("#selectStudent").remove();
         if(document.querySelector("#ausents")) document.querySelector("#ausents").remove();
-        return await asistanceByClass();
+        return await asistanceByCourse();
     }
     if(by == "Alumno") {
-        if(byClass) {byClass.remove();}
+        if(byCourse) {byCourse.remove();}
         if(document.querySelector("#date")) document.querySelector("#date").remove();
         return asistanceByStudent();
     }
 }
 async function init(){
-    let by = insertToSelection(["Clase","Alumno"]);
+    let by = insertToSelection(["Curso","Alumno"]);
     by.id = "by";
     document.querySelector("header").insertBefore(by,document.querySelector("#year"));
     await showAsistances(by);
