@@ -1,3 +1,5 @@
+
+const backend = "http://localhost:3000/";
 function formResult(event) {
     const form = event.target;
     for(let element of form.elements) {
@@ -13,7 +15,7 @@ function formResult(event) {
     if(Object.values(data).some(values => values == "")) {alert("No podes dejar campos vacios");return undefined;}
     return data 
 }
-async function httpRequest(endpoint,method,body,url="https://asistances-backend.facuvatti.workers.dev/",event=null) { // Es un handler para formularios
+async function httpRequest(endpoint,method,body,url=backend,event=null) { // Es un handler para formularios
     let options = {
         method: method,
         headers: {
