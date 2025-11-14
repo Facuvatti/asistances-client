@@ -161,7 +161,8 @@ function newStudent(event,year,division,specialty) {
 }
 async function init(){
     let response = await httpRequest("courses","GET");
-    if(response.length == 0) window.location.replace("load.html");
+    
+    if(response.courses.length == 0) window.location.replace("load.html");
     const year = await dbOptions(document.querySelector("#year"),"courses/years");
     const specialty = await dbOptions(document.querySelector("#specialty"),"courses/specialties");
     const division = await dbOptions(document.querySelector("#division"),"courses/divisions");

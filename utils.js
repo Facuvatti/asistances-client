@@ -11,7 +11,7 @@ function formResult(event) {
         if (typeof value === 'string' && key != "password") value = value.toLowerCase();
         data[key] = value.trim();
     }
-    form.reset();
+    //form.reset();
     if(Object.values(data).some(values => values == "")) {alert("No podes dejar campos vacios");return undefined;}
     return data 
 }
@@ -29,12 +29,15 @@ async function httpRequest(endpoint,method,body,url=backend,event=null) { // Es 
     };
     if (body) options.body = JSON.stringify(body);
     let response = await fetch(url + endpoint, options)
-    if (!response.ok) {
-        console.error(`❌ Error HTTP ${response.status}: ${response.statusText} (${url + endpoint})`);
-        return null;
+    if(!response){
+        console.log(response?.error);
+        return;
     }
-    
-    try {let json = await response.json();console.log(json);return json;} catch(e) {console.error(e);}
+    try {
+        let json = await response.json();
+        json.ok = response.ok;
+        return json;
+    } catch(e) {console.error(e);}
 }
 
 function insertToSelection(options,select=undefined,ids=undefined) {

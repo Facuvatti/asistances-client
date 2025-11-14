@@ -1,7 +1,7 @@
 import {httpRequest,formResult} from "./utils.js";
 async function init() {
     let response = await httpRequest("courses","GET");
-    if(response.length == 0) document.querySelector("#index").remove();
+    if(!response) document.querySelector("#index").remove();
 }
 init()
 async function makeRoom(e) {
