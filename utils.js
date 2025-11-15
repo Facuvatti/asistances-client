@@ -11,16 +11,16 @@ function formResult(event) {
         if (typeof value === 'string' && key != "password") value = value.toLowerCase();
         data[key] = value.trim();
     }
-    //form.reset();
+    form.reset();
     if(Object.values(data).some(values => values == "")) {alert("No podes dejar campos vacios");return undefined;}
     return data 
 }
 async function httpRequest(endpoint,method,body,url=backend,event=null) { // Es un handler para formularios
     let options = {
         method: method,
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
-            credentials: 'include'
         }
     };
     if (event) {

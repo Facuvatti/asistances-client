@@ -6,7 +6,7 @@ async function account(event,endpoint) {
     if(!endpoint) endpoint = "register";
     let response = await httpRequest("account/"+endpoint,"POST",body);
     console.log(response);
-    if(!response.ok){
+    if(!response?.ok){
         if(response.error === "existe") window.location.href = "account.html?account=login";
         if(response.error === "no existe") window.location.href = "account.html?account=register";
         else console.log(response.error);
@@ -15,7 +15,8 @@ async function account(event,endpoint) {
         let h1 = document.createElement("h1");
         h1.textContent = response.message;
         document.body.append(h1);
-        window.location.href = "index.html";
+        setInterval(() => window.location.href = "index.html", 5000);
+        
     }; 
 }
 const params = new URLSearchParams(window.location.search);

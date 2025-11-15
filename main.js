@@ -134,7 +134,6 @@ function newStudent(event,year,division,specialty) {
         if(!body) return;
         else {
         const course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
-        console.log(course);
         body.classId = course[0].id;
             let response = await httpRequest("student","POST",body);
             let id = response[0].id; 
@@ -162,7 +161,7 @@ function newStudent(event,year,division,specialty) {
 async function init(){
     let response = await httpRequest("courses","GET");
     
-    if(response.courses.length == 0) window.location.replace("load.html");
+    if(!response.courses?.length) window.location.replace("load.html");
     const year = await dbOptions(document.querySelector("#year"),"courses/years");
     const specialty = await dbOptions(document.querySelector("#specialty"),"courses/specialties");
     const division = await dbOptions(document.querySelector("#division"),"courses/divisions");
