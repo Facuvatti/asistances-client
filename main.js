@@ -66,10 +66,18 @@ function makeButton(name,eventListener,parameters) {
     button.addEventListener("click",function(event) {eventListener(event,...parameters)},false);
     return button;
 }
+function getCourse() {
+    let courses = document.querySelector("#courses")
+    const courseValues= (selected(courses).value).split(" ");
+    const year = courseValues[0];
+    const division = courseValues[1];
+    const specialty = courseValues[2];
+    return {course: selected(courses).getAttribute("data-id"), year, division, specialty}
+}
 
-
-async function students(year,division,specialty,toHide=["#students","#new_student"]) {
+async function students(toHide=["#students","#new_student"]) {
     try{
+        let {course, year, division, specialty} = getCourse();
         let anchor = document.querySelector("#load");
         anchor.href = "load.html";
         let header = document.querySelector("header");
@@ -77,11 +85,10 @@ async function students(year,division,specialty,toHide=["#students","#new_studen
         visibility(toHide,false);
         let tbody = document.querySelector("#students > tbody");
         tbody.innerHTML = "";
-        let course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET").catch(e => {console.log(e)});
         const today = new Date().toISOString().split('T')[0]
-        let asistances = await httpRequest("asistances/"+course[0].id+"/"+today,"GET")
+        let asistances = await httpRequest("asistances/"+course+"/"+today,"GET")
         let lastAsistances = getLatestRecords(asistances);
-        httpRequest("students/"+course[0].id,"GET")
+        httpRequest("students/"+course,"GET")
         .then(students => {
             for(let student of students) {
                 let present = makeButton("P",radioButton,[student]);
@@ -109,16 +116,17 @@ async function students(year,division,specialty,toHide=["#students","#new_studen
         });
     } catch(e) {console.log(e)}
 }
-function newStudentButton(year,division,specialty) {
+function newStudentButton() {
     let new_student = document.createElement("button");
     new_student.textContent = "Añadir alumno";
     new_student.id = "new_student";
-    new_student.addEventListener("click",( event ) => newStudent(event,year,division,specialty));
+    new_student.addEventListener("click",( event ) => newStudent(event));
     document.querySelector("body").append(new_student);
 }
-function newStudent(event,year,division,specialty) {
+function newStudent(event) {
     event.preventDefault();
-    document.querySelector("#new_student").remove();
+    document.querySelector("#new_student").remove(); // Borra el boton
+    // Creando formulario con sus camposm el contenedor y la funcion que se ejecutaria al cancelar el formulario
     let form = createForm(
         "students",           // containerID
         [["lastname","text"],["name","text"]], // inputs
@@ -133,27 +141,24 @@ function newStudent(event,year,division,specialty) {
         let body = formResult(event);
         if(!body) return;
         else {
-        const course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
-        body.classId = course[0].id;
-            let response = await httpRequest("student","POST",body);
-            let id = response[0].id; 
-            body.id = id;
-            let present = makeButton("P",radioButton,body);
-            let late = makeButton("T",radioButton,body);
-            let absent = makeButton("A",radioButton,body);
-            let retired = makeButton("RA",radioButton,body);
-            let actions = document.createElement("td");
-            actions.append(present,late,absent,retired);
-            body.actions = actions;
-            delete body.id;
-            delete body.courseId;
-            makeRow(body,document.querySelector("#students > tbody"));
-            body.year = selected(year).value;
-            body.division = selected(division).value;
-            body.specialty = selected(specialty).value;
-            delete body.actions;
-            document.querySelector(".creating-students").remove();
-            newStudentButton();
+        const course = getCourse();
+        body.courseId = course;
+        let response = await httpRequest("student","POST",body);
+        let id = response[0].id; 
+        body.id = id;
+        let present = makeButton("P",radioButton,body);
+        let late = makeButton("T",radioButton,body);
+        let absent = makeButton("A",radioButton,body);
+        let retired = makeButton("RA",radioButton,body);
+        let actions = document.createElement("td");
+        actions.append(present,late,absent,retired);
+        body.actions = actions;
+        delete body.id;
+        delete body.courseId;
+        makeRow(body,document.querySelector("#students > tbody"));
+        delete body.actions;
+        document.querySelector(".creating-students").remove();
+        newStudentButton();
             
         }
     }
@@ -161,19 +166,19 @@ function newStudent(event,year,division,specialty) {
 async function init(){
     let response = await httpRequest("courses","GET");
     
-    if(!response.courses?.length) window.location.replace("load.html");
-    const year = await dbOptions(document.querySelector("#year"),"courses/years");
-    const specialty = await dbOptions(document.querySelector("#specialty"),"courses/specialties");
-    const division = await dbOptions(document.querySelector("#division"),"courses/divisions");
-    if (!year.options.length || !division.options.length || !specialty.options.length) {
-        console.error("Faltan opciones para armar la clase");
+    //if(!response.courses?.length > 0) window.location.replace("load.html");
+    const course = await dbOptions(document.querySelector("#course"),response);
+    if (!course.options.length) {
+        console.error("Faltan opciones para el curso");
         return;
     }
-    students(year,division,specialty)
-    year.addEventListener("change", () => students(year,division,specialty))
-    division.addEventListener("change", () => students(year,division,specialty))
-    specialty.addEventListener("change", () => students(year,division,specialty))
-    newStudentButton(year,division,specialty);
+    students()
+    course.addEventListener("change", () => students())
+    const division = document.querySelector("#division");
+    division.addEventListener("change", () => students())
+    const specialty = document.querySelector("#specialty");
+    specialty.addEventListener("change", () => students())
+    newStudentButton();
 
 }
 init();

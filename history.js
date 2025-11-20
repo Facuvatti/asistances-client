@@ -19,13 +19,13 @@ function expandDetails(event,asistances,tbody) {
     
 }
 async function getCourse() {
-    
-    if(document.querySelector("#year").options.length == 0) {const year = await dbOptions(document.querySelector("#year"),"years");}
-    if(document.querySelector("#division").options.length == 0) {const division = await dbOptions(document.querySelector("#division"),"divisions");}
-    if(document.querySelector("#specialty").options.length == 0) {const specialty = await dbOptions(document.querySelector("#specialty"),"specialties");}
-    let course = await httpRequest("courses/"+selected(year).value+"/"+selected(division).value+"/"+selected(specialty).value,"GET");
-    course = course[0].id;
-    return {course, year, division, specialty}
+    let courses = document.querySelector("#courses")
+    if(courses.options.length == 0) {courses = await dbOptions(courses,"courses");} // Si el select de cursos no tiene opciones, se obtienen de la base de datos y se agregan
+    const courseValues= (selected(courses).value).split(" ");
+    const year = courseValues[0];
+    const division = courseValues[1];
+    const specialty = courseValues[2];
+    return {course: selected(courses).getAttribute("data-id"), year, division, specialty}
 }
 function createTable(){
     if(document.querySelector("#byCourse") == null) {
@@ -158,7 +158,7 @@ async function studentGrid() {
         div.append(table);
         body.insertBefore(div,document.querySelector("script"));
     }
-    if(document.querySelector("#ausents")) document.querySelector("#ausents").remove();
+    if(document.querySelector("#absents")) document.querySelector("#absents").remove();
 }
 async function asistanceByStudent() {
     reset();
@@ -176,13 +176,13 @@ async function asistanceByStudent() {
     tbody.innerHTML = "";
     let attendances = await httpRequest("asistances/student/"+studentId,"GET")
     const Year = new Date().toISOString().split('T')[0].split("-")[0];
-    let yearAusents = 0;
+    let yearAbsents = 0;
     // Agregando las filas ( y la presencia del alumno en cada dia)
     for(let month of ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]) {
         // Nombre del mes
         let tr = document.createElement("tr");
         let td = document.createElement("td");
-        let ausents = 0;
+        let absents = 0;
         td.textContent = month;
         tr.append(td);
         for(let day=1;day<=31;day++) {
@@ -193,15 +193,15 @@ async function asistanceByStudent() {
             let presence = attendances.find(attendance => {if(attendance["date"].split(" ")[0] == Year+"-"+m+"-"+day) {td.textContent = attendance["presence"];return attendance;} else return undefined;});
             if(presence) {
                 td.textContent = presence["presence"];
-                if(presence["presence"] == "A") ausents++;
-                if(presence["presence"] in ["T","RA"]) ausents = ausents + 0.5;
+                if(presence["presence"] == "A") absents++;
+                if(presence["presence"] in ["T","RA"]) absents = absents + 0.5;
             }
             else {td.textContent = "";}
             tr.append(td);
         }
-        yearAusents += ausents;
+        yearAbsents += absents;
         td = document.createElement("td");
-        td.textContent = ausents;
+        td.textContent = absents;
         td.style.textAlign = "center";
         tr.append(td);
         tbody.append(tr);
@@ -209,10 +209,10 @@ async function asistanceByStudent() {
     }
     table.append(tbody);
     let h1 = document.createElement("h1");
-    h1.id = "ausents";
-    if(yearAusents == 0) h1.textContent = "¡No tiene faltas!";
-    else h1.textContent = "Faltas: "+ yearAusents;
-    if(yearAusents > 20) h1.style.color = "red";
+    h1.id = "absents";
+    if(yearAbsents == 0) h1.textContent = "¡No tiene faltas!";
+    else h1.textContent = "Faltas: "+ yearAbsents;
+    if(yearAbsents > 20) h1.style.color = "red";
     document.querySelector("body").append(h1);
 
 }
@@ -223,7 +223,7 @@ async function showAsistances(by) {
     if(by == "Clase") {
         if(byStudent) byStudent.remove();
         if(document.querySelector("#selectStudent")) document.querySelector("#selectStudent").remove();
-        if(document.querySelector("#ausents")) document.querySelector("#ausents").remove();
+        if(document.querySelector("#absents")) document.querySelector("#absents").remove();
         return await asistanceByCourse();
     }
     if(by == "Alumno") {

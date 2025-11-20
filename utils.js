@@ -47,9 +47,9 @@ function insertToSelection(options,select=undefined,ids=undefined) {
     if(typeof options == "object"){
         for (let option of options) {
             let op = document.createElement("option");
-            if(ids) {op.value = ids[options.indexOf(option)];}
+            if (ids) {op.setAttribute("data-id",ids[options.indexOf(option)]);}
             if (typeof option == "string" && op.value == null) op.value = option;
-            if(typeof option == "object" && op.value == null) op.value = Object.values(option)[0];
+            if (typeof option == "object" && op.value == null) op.value = Object.values(option)[0];
             
             let i = 0;
             let text = "";
@@ -84,24 +84,21 @@ function selected(select){
     }}
     else return undefined
 }
-async function dbOptions(select,endpoint,fields=undefined) {
-    let optionsResponse = await httpRequest(endpoint,"GET");
+async function dbOptions(select,endpoint) {
+    let response;
+    if (typeof endpoint == "object") response = endpoint;
+    else response = await httpRequest(endpoint,"GET");
     let options = [];
     let ids = [];
-    if(fields) {
-        for(let optionResponse of optionsResponse) {
-            let option;
-            let i=0;
-            for(let field of fields) {
-                if(field == "id") {ids.push(optionResponse["id"]);continue;}
-                let value = optionResponse[field];
-                if(i == 0) option = value;
-                else option = option+" "+value;
-                i++;
-            }
-            options.push(option);
-        }
-    } else options = optionsResponse;
+    for(let [key,value] of Object.entries(response)) {
+        let option;
+        let i=0;
+        if(key == "id") {ids.push(row["id"]);continue;}
+        if(i == 0) option = value;
+        else option = option+" "+value;
+        i++;
+        options.push(option);
+    }
     if(ids.length === 0) ids = undefined;
     select = insertToSelection(options,select,ids);
     if (select.options.length === 1) select.dispatchEvent(new Event('change'));
