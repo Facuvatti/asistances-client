@@ -37,9 +37,11 @@ async function httpRequest(endpoint,method,body,url=backend,event=null) { // Es 
         let json = await response.json();
         json.ok = response.ok;
         return json;
-    } catch(e) {console.error(e);}
+    } catch(e) {
+        console.error("Error al intentar convertir el json",e);
+        console.log(response);
+    }
 }
-
 function insertToSelection(options,select=undefined,ids=undefined) {
     if (select == undefined) {
         select = document.createElement("select");
@@ -88,15 +90,12 @@ async function dbOptions(select,endpoint) {
     let response;
     if (typeof endpoint == "object") response = endpoint;
     else response = await httpRequest(endpoint,"GET");
+    response = response.courses;
     let options = [];
     let ids = [];
-    for(let [key,value] of Object.entries(response)) {
-        let option;
-        let i=0;
-        if(key == "id") {ids.push(row["id"]);continue;}
-        if(i == 0) option = value;
-        else option = option+" "+value;
-        i++;
+    for(let row of response) {
+        ids.push(row.id);
+        let option = Object.values(Object.fromEntries(Object.entries(row).filter(([key,value]) => !["id","user"].includes(key)))).join(" ")
         options.push(option);
     }
     if(ids.length === 0) ids = undefined;

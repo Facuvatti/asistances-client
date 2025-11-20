@@ -86,10 +86,13 @@ async function students(toHide=["#students","#new_student"]) {
         let tbody = document.querySelector("#students > tbody");
         tbody.innerHTML = "";
         const today = new Date().toISOString().split('T')[0]
-        let asistances = await httpRequest("asistances/"+course+"/"+today,"GET")
-        let lastAsistances = getLatestRecords(asistances);
+        let asistances = await httpRequest("asistances/get","POST",{course,date:today});
+        console.log("asistances",asistances)
+        let lastAsistances;
+        if (asistances) lastAsistances = getLatestRecords(asistances);
         httpRequest("students/"+course,"GET")
         .then(students => {
+            console.log("students",students)
             for(let student of students) {
                 let present = makeButton("P",radioButton,[student]);
                 let late = makeButton("T",radioButton,[student]);
@@ -165,20 +168,15 @@ function newStudent(event) {
 }
 async function init(){
     let response = await httpRequest("courses","GET");
-    
-    //if(!response.courses?.length > 0) window.location.replace("load.html");
-    const course = await dbOptions(document.querySelector("#course"),response);
+    if(!response.courses?.length > 0) window.location.replace("load.html");
+    let course = await dbOptions(document.querySelector("#courses"),response);
     if (!course.options.length) {
         console.error("Faltan opciones para el curso");
         return;
     }
     students()
-    course.addEventListener("change", () => students())
-    const division = document.querySelector("#division");
-    division.addEventListener("change", () => students())
-    const specialty = document.querySelector("#specialty");
-    specialty.addEventListener("change", () => students())
-    newStudentButton();
+    course.addEventListener("change", () => students());
+    newStudentButton();;
 
 }
 init();

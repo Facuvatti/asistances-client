@@ -27,6 +27,7 @@ async function checkSession () {
     }
     } else if(!userCreated) {
         if(document.querySelector(".closeSession")) document.querySelector(".closeSession").remove();
+        if(window.location.pathname !== "/account.html") window.location.replace("/account.html?account=register");
         if(!document.querySelector(".login")){
             let login = document.createElement("button");
             login.classList.add("login");
@@ -41,10 +42,13 @@ async function checkSession () {
             register.addEventListener("click", () => location.href = "account.html?account=register");
             document.querySelector("header").append(register);
         }
-        if(window.location.pathname === "/account.html") {
-            if(document.querySelector(".login")) document.querySelector(".login").remove();
-            if(document.querySelector(".register")) document.querySelector(".register").remove();
+        if(window.location.pathname == "/account.html") {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get("account") === "register" && document.querySelector(".register")) document.querySelector(".register").remove();
+            if(params.get("account") === "login" && document.querySelector(".login")) document.querySelector(".login").remove();
         }
     }
 }
+
+
 checkSession();
