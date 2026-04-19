@@ -1,6 +1,6 @@
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const API_URL = 'http://localhost:3000';
 
 export async function httpRequest<T = any>(
   endpoint: string,
@@ -14,11 +14,9 @@ export async function httpRequest<T = any>(
       'Content-Type': 'application/json'
     }
   };
-
   if (body) {
     options.body = JSON.stringify(body);
   }
-
   const response = await fetch(`${API_URL}/${endpoint}`, options);
   const json = await response.json();
   return json as T;
