@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { buildFormBody, httpRequest } from '../api';
 import { AccountResponse } from '../types'; 
-function Account({ onLogin }: { onLogin: () => void }) {
+function Account({ onLogin,user }: { onLogin: () => void, user: string | undefined }) {
   const [mode, setMode] = useState<'register' | 'login'>('register');
   const [message, setMessage] = useState<string>('');
 
@@ -12,7 +12,6 @@ function Account({ onLogin }: { onLogin: () => void }) {
       setMessage('Complete todos los campos antes de enviar.');
       return;
     }
-
     const response = (await httpRequest<AccountResponse>(`account/${mode}`, 'POST', body)) || {};
     if (response.error) {
       setMessage(response.error || 'Error al procesar la cuenta');
@@ -21,6 +20,7 @@ function Account({ onLogin }: { onLogin: () => void }) {
     setMessage(response.message || 'Operación correcta.');
     setTimeout(() => onLogin(), 500);
   }
+  
 
   return (
     <div className="container">

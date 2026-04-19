@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { httpRequest, buildFormBody } from '../api';
 import { AttendanceRecord, Course, Student } from '../types';
 import { getLatestRecords, fetchCourses } from '../utils';
-function Attendance() {
+function Attendance({user}: {user: string | undefined}) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [students, setStudents] = useState<Student[]>([]);
@@ -27,6 +27,7 @@ function Attendance() {
     setLoading(true);
     const today = new Date().toISOString().split('T')[0];
     try {
+      if(!user) return
       const [studentsResult, attendanceResult] = await Promise.all([
         httpRequest<Student[]>(`students/${courseId}`),
         httpRequest<AttendanceRecord[]>('asistances/get', 'POST', { course: courseId, date: today })
@@ -42,6 +43,7 @@ function Attendance() {
   }
 
   async function handlePresence(studentId: string, presence: string) {
+    if(!user) return
     await httpRequest('asistances', 'POST', { studentId, presence });
     setPresenceMap((prev) => ({ ...prev, [studentId]: presence }));
   }
@@ -56,7 +58,7 @@ function Attendance() {
     }
     body.course = selectedCourse;
 
-    if(document.cookie !== '') await httpRequest('student', 'POST', body);
+    if(user) await httpRequest('student', 'POST', body);
     setEditing(false);
     setFormMessage('Alumno creado correctamente.');
     setTimeout(() => setFormMessage(''), 3000);

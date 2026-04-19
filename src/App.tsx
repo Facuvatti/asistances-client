@@ -51,11 +51,14 @@ function App() {
   return (
     <>
       <Header user={user} onNavigate={setPage} onLogout={handleLogout} />
+
+      {!user ? (<Account onLogin={handleLogin}  user={user} />) : (<>
+      {page === 'attendance' && <Attendance user={user} />}
+      {page === 'load' && <Load  user={user} />}
+      {page === 'account' && <Account onLogin={handleLogin}  user={user} />}
+      {page === 'history' && <History user={user} />}
       {statusMessage && <p>{statusMessage}</p>}
-      {page === 'attendance' && <Attendance />}
-      {page === 'load' && <Load />}
-      {page === 'account' && <Account onLogin={handleLogin} />}
-      {page === 'history' && <History />}
+      </>)}
     </>
   );
 }

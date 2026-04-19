@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { buildFormBody, httpRequest } from '../api';
 import { AttendanceRecord } from '../types';
 
-function History() {
+function History({user}: {user: string | undefined}) {
     const [records, setRecords] = useState<AttendanceRecord[]>([]);
     const [formMessage, setFormMessage] = useState('');
 
@@ -13,7 +13,7 @@ function History() {
             setFormMessage('Complete todos los campos antes de enviar.');
             return;
         }
-
+        if(!user) return;
         const response = (await httpRequest<AttendanceRecord[]>('asistances/get', 'POST', body)) || [];
         setRecords(Array.isArray(response) ? response : []);
         formMessage && setFormMessage('Operación correcta.');
