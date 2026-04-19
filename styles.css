@@ -251,3 +251,9 @@ tr.show, button.show, .date.show {
 .row-appear {
   animation: slideDown 0.4s ease forwards;
 }
+
+
+
+p, ul > li {
+font-family: sans-serif;
+}
