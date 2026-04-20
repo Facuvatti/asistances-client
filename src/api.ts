@@ -1,6 +1,6 @@
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://api.asistances.dpdns.org/';
 
 export async function httpRequest<T = any>(
   endpoint: string,
