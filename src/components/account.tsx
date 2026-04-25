@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { buildFormBody, httpRequest } from '../api';
 import { AccountResponse } from '../types'; 
-function Account({ onLogin,user }: { onLogin: () => void, user: string | undefined }) {
+function Account({ onLogin }: { onLogin: () => void }) {
   const [mode, setMode] = useState<'register' | 'login'>('register');
   const [message, setMessage] = useState<string>('');
 

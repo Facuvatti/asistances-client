@@ -52,10 +52,10 @@ function App() {
     <>
       <Header user={user} onNavigate={setPage} onLogout={handleLogout} />
 
-      {!user ? (<Account onLogin={handleLogin}  user={user} />) : (<>
+      {!user ? (<Account onLogin={handleLogin} />) : (<>
       {page === 'attendance' && <Attendance user={user} />}
       {page === 'load' && <Load  user={user} />}
-      {page === 'account' && <Account onLogin={handleLogin}  user={user} />}
+      {page === 'account' && <Account onLogin={handleLogin} />}
       {page === 'history' && <History user={user} />}
       {statusMessage && <p>{statusMessage}</p>}
       </>)}
