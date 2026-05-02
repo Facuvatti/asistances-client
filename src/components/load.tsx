@@ -3,19 +3,17 @@ import { httpRequest, buildFormBody } from '../api';
 import { Course } from '../types';
 import { fetchCourses } from '../utils';
 type LoadMode = 'Curso' | 'Materia' | 'Estudiantes';
-function Load({user}:{user: string | undefined}) {
+function Load() {
   const [mode, setMode] = useState<LoadMode>('Curso');
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if(!user) return
     fetchCourses( setCourses, setSelectedCourse);
   }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if(!user) return
     event.preventDefault();
     const form = event.currentTarget;
     const body = buildFormBody(form);
