@@ -1,44 +1,40 @@
 import { useState } from 'react';
-import { buildFormBody, httpRequest } from '../api';
-import { AccountResponse } from '../types'; 
+import { authClient } from '../auth';
+
+// Solo inicio de sesión: las cuentas las crea un administrador.
 function Account({ onLogin }: { onLogin: () => void }) {
-  const [mode, setMode] = useState<'register' | 'login'>('register');
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const body = buildFormBody(event.currentTarget);
-    if (!body) {
-      setMessage('Complete todos los campos antes de enviar.');
+    const form = new FormData(event.currentTarget);
+    const username = String(form.get('username') ?? '').trim().toLowerCase();
+    const password = String(form.get('password') ?? '');
+    if (!username || !password) {
+      setMessage('Complete usuario y contraseña.');
       return;
     }
-    const response = (await httpRequest<AccountResponse>(`account/${mode}`, 'POST', body)) || {};
-    if (response.error) {
-      setMessage(response.error || 'Error al procesar la cuenta');
+    setLoading(true);
+    const { error } = await authClient.signIn.username({ username, password });
+    setLoading(false);
+    if (error) {
+      setMessage(error.status === 401 ? 'Usuario o contraseña incorrectos.' : error.message || 'No se pudo iniciar sesión.');
       return;
     }
-    setMessage(response.message || 'Operación correcta.');
-    setTimeout(() => onLogin(), 500);
+    onLogin();
   }
-  
 
   return (
-    <div className="container">
-      <h2>{mode === 'register' ? 'Registrarse' : 'Iniciar sesión'}</h2>
-      <div>
-        <button onClick={() => setMode('register')} type="button">
-          Registrarse
-        </button>
-        <button onClick={() => setMode('login')} type="button">
-          Iniciar sesión
-        </button>
-      </div>
+    <div className="container narrow">
+      <h2>Iniciar sesión</h2>
       <form onSubmit={handleSubmit}>
-        <input name="name" placeholder="Nombre" />
-        <input name="password" type="password" placeholder="Contraseña" />
-        <button type="submit">Enviar</button>
+        <input name="username" placeholder="Usuario" autoComplete="username" autoCapitalize="none" />
+        <input name="password" type="password" placeholder="Contraseña" autoComplete="current-password" />
+        <button type="submit" className="primary" disabled={loading}>{loading ? 'Ingresando...' : 'Ingresar'}</button>
       </form>
-      {message && <p>{message}</p>}
+      <p className="hint">¿No tenés cuenta? Pedísela a la administración de la escuela.</p>
+      {message && <p className="error">{message}</p>}
     </div>
   );
 }
