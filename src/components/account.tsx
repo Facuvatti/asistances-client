@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { authClient } from '../auth';
+import { DemoUser } from '../demo';
+import { ROLE_LABELS } from '../types';
 
 // Solo inicio de sesión: las cuentas las crea un administrador.
-function Account({ onLogin }: { onLogin: () => void }) {
+function Account({ onLogin, demoUsers = [], onDemoLogin }: {
+  onLogin: () => void;
+  demoUsers?: DemoUser[];
+  onDemoLogin?: (username: string) => Promise<void>;
+}) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -27,6 +33,19 @@ function Account({ onLogin }: { onLogin: () => void }) {
 
   return (
     <div className="container narrow">
+      {demoUsers.length > 0 && (
+        <>
+          <h2>Probá la demo</h2>
+          <p className="hint">Entrá con un clic como cualquier rol y mirá qué puede hacer cada uno:</p>
+          <div className="demo-roles">
+            {demoUsers.map((u) => (
+              <button key={u.username} type="button" onClick={() => onDemoLogin?.(u.username)} title={u.description}>
+                {ROLE_LABELS[u.role]}{demoUsers.filter((x) => x.role === u.role).length > 1 ? ` (${u.username})` : ''}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       <h2>Iniciar sesión</h2>
       <form onSubmit={handleSubmit}>
         <input name="username" placeholder="Usuario" autoComplete="username" autoCapitalize="none" />

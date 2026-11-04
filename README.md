@@ -33,3 +33,10 @@ el build de producción usa `https://api.asistances.dpdns.org`). En producción 
 Inicio de sesión con usuario y contraseña (better-auth). Usuarios demo: `admin`, `preceptor`,
 `profesor`, `alumno`, `padre` (contraseña `demo1234`). Cada rol ve solo sus pantallas; el admin
 crea las cuentas desde *Usuarios*, de a una o importando un CSV.
+
+## 🎭 Modo demo
+
+Si la API corre con `DEMO_MODE=true`, el cliente muestra una barra "Modo demo · Ver como:" para
+cambiar entre Administrador, Preceptor, Profesor, Alumno y Padre con un clic (con una explicación
+y qué probar en cada rol), botones de entrada rápida en el login y "Restablecer datos". No requiere
+ninguna variable en el cliente: consulta `GET /demo` a la API.

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { authClient } from './auth';
 import { Role, ROLE_LABELS } from './types';
-import { Attendance, History, Load, Account, Share, Users, MyAttendance } from './components';
+import { Attendance, History, Load, Account, Share, Users, MyAttendance, DemoBar } from './components';
+import { DemoInfo, demoLogin, fetchDemo } from './demo';
 
 type Page = 'attendance' | 'load' | 'share' | 'history' | 'users' | 'mine';
 
@@ -45,11 +46,18 @@ function App() {
   const pages = PAGES.filter((p) => role && p.roles.includes(role));
   const [page, setPage] = useState<Page | undefined>();
   const [statusMessage, setStatusMessage] = useState('');
+  const [demo, setDemo] = useState<DemoInfo>({ enabled: false, users: [] });
+
+  useEffect(() => {
+    fetchDemo().then(setDemo);
+  }, []);
 
   // Página inicial (y al cambiar de usuario): la primera disponible para el rol.
+  // Al cambiar de usuario (p. ej. en la demo) se vuelve a la pantalla inicial de su rol.
+  const userId = session?.user.id;
   useEffect(() => {
-    if (!pages.some((p) => p.page === page)) setPage(pages[0]?.page);
-  }, [role]);
+    setPage(pages[0]?.page);
+  }, [userId, role]);
 
   async function handleLogout() {
     await authClient.signOut();
@@ -66,20 +74,28 @@ function App() {
   return (
     <>
       <Header name={session?.user.name} role={role} pages={pages} onNavigate={setPage} onLogout={handleLogout} />
+      {demo.enabled && session && (
+        <DemoBar
+          users={demo.users}
+          username={(session.user as { username?: string }).username}
+          role={role}
+          onSwitched={async () => { await refetch(); }}
+        />
+      )}
       <main>
         {isPending ? (
           <p className="loading">Cargando...</p>
         ) : !session || !role ? (
-          <Account onLogin={handleLogin} />
+          <Account onLogin={handleLogin} demoUsers={demo.enabled ? demo.users : []} onDemoLogin={async (u) => { await demoLogin(u); await handleLogin(); }} />
         ) : (
-          <>
+          <div key={userId}>
             {page === 'attendance' && <Attendance role={role} />}
             {page === 'mine' && <MyAttendance role={role} />}
             {page === 'load' && <Load role={role} />}
             {page === 'share' && <Share role={role} />}
             {page === 'history' && <History role={role} />}
             {page === 'users' && <Users currentUserId={session.user.id} />}
-          </>
+          </div>
         )}
         {statusMessage && <p className="message">{statusMessage}</p>}
       </main>

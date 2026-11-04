@@ -5,3 +5,4 @@ export { default as Load } from "./load";
 export { default as Share } from "./share";
 export { default as Users } from "./users";
 export { default as MyAttendance } from "./myAttendance";
+export { default as DemoBar } from "./demoBar";
